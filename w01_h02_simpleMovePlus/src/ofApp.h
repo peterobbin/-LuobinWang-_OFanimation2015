@@ -23,4 +23,6 @@ public:
     customCircle myCircle;
     
     float pct;
+    float rad;
+    float maxRad;
 };

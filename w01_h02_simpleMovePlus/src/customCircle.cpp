@@ -20,14 +20,23 @@ void customCircle::update(float _pct){
 
 void customCircle::easeIn(float _pct){
     pct = powf(_pct, 2);
+    currentPos = initPos * (1 - pct) + finalPos * pct;
+}
+
+void customCircle::easeOut(float _pct){
+    pct = _pct * (2 - _pct);
+    currentPos = initPos * (1 - pct) + finalPos * pct;
 }
 
 
 
 
-
-void customCircle::draw(){
-    ofCircle(currentPos, 10);
+void customCircle::draw(float _rad){
+    rad = _rad;
+    ofSetColor(255*(1 -pct));
+    ofLine(currentPos,finalPos);
+    ofSetColor(255, 255, 255);
+    ofCircle(currentPos, rad);
     currentPos = initPos * (1 - pct) + finalPos * pct;
     
 }

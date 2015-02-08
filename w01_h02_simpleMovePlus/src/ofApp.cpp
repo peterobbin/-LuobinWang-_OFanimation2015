@@ -2,25 +2,39 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    ofSetBackgroundAuto(false);
     ofBackground(0);
+    ofEnableAlphaBlending();
+    ofSetFrameRate(60);
     
-    myCircle.setup(ofVec2f(0,500), ofVec2f(ofGetWindowWidth(), 500));
+    myCircle.setup(ofVec2f(ofGetWindowWidth()/2,ofGetWindowHeight()/2), ofVec2f(ofGetWindowWidth()/2,ofGetWindowHeight()/2));
     pct = 0;
+    rad = 0;
+    maxRad = 10;
+    
+    
     
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     if (pct < 0.99){
-        pct += 0.01;}
+        pct += 0.01;
+    }
     
-    myCircle.easeIn(pct);
+    rad = maxRad * (1 - pct);
+    
+    myCircle.easeOut(pct);
     
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    myCircle.draw();
+    
+    ofSetColor(0,0,0,99);
+    ofRect(0,0,ofGetWidth(),ofGetHeight());//motion blur
+    myCircle.draw(rad);
+    
 }
 
 //--------------------------------------------------------------
