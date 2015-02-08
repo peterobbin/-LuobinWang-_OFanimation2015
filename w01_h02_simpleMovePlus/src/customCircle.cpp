@@ -35,6 +35,7 @@ void customCircle::draw(float _rad){
     rad = _rad;
     ofSetColor(255*(1 -pct));
     ofLine(currentPos,finalPos);
+    ofDrawBitmapString(ofToString(finalPos.x) + ", " + ofToString(finalPos.y), finalPos);
     ofSetColor(255, 255, 255);
     ofCircle(currentPos, rad);
     currentPos = initPos * (1 - pct) + finalPos * pct;
