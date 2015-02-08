@@ -33,9 +33,16 @@ void customCircle::easeOut(float _pct){
 
 void customCircle::draw(float _rad){
     rad = _rad;
-    ofSetColor(255*(1 -pct));
+    ofSetColor(255*(1 -pct)); // alpha animation
     ofLine(currentPos,finalPos);
-    ofDrawBitmapString(ofToString(finalPos.x) + ", " + ofToString(finalPos.y), finalPos);
+    ofDrawBitmapString("x"  + ofToString(finalPos.x) + ", " + "y" + ofToString(finalPos.y) + ", " + ofToString(pct*100) + "%", finalPos);
+    
+    ofNoFill();
+    ofCircle(finalPos, 50 * pct*(2-pct));
+    ofFill();
+    
+    
+    
     ofSetColor(255, 255, 255);
     ofCircle(currentPos, rad);
     currentPos = initPos * (1 - pct) + finalPos * pct;

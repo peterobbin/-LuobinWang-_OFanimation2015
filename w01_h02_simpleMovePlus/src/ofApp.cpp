@@ -6,12 +6,14 @@ void ofApp::setup(){
     ofBackground(0);
     ofEnableAlphaBlending();
     ofSetFrameRate(60);
+    ofDisableAntiAliasing();
     
     myCircle.setup(ofVec2f(ofGetWindowWidth()/2,ofGetWindowHeight()/2), ofVec2f(ofGetWindowWidth()/2,ofGetWindowHeight()/2));
     pct = 0;
     rad = 0;
     maxRad = 10;
     
+    ofSetCircleResolution(50);
     
     
 }
@@ -65,6 +67,7 @@ void ofApp::mousePressed(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
     pct = 0.0;
+    
     myCircle.setNewPos(ofVec2f(x, y));
 }
 
