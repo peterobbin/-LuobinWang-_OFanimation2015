@@ -18,10 +18,21 @@ void customCircle::update(float _pct){
     currentPos = initPos * (1 - pct) + finalPos * pct;
 }
 
+void customCircle::easeIn(float _pct){
+    pct = powf(_pct, 2);
+}
+
+
+
+
+
 void customCircle::draw(){
     ofCircle(currentPos, 10);
+    currentPos = initPos * (1 - pct) + finalPos * pct;
     
 }
+
+
 
 void customCircle::setNewPos(ofVec2f _newPos){
 

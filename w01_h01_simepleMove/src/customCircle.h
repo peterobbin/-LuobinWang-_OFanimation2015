@@ -13,9 +13,11 @@
 class customCircle {
 public:
     void setup(ofVec2f _initPos, ofVec2f _finalPos);
-    void update(float pct);
+    void update(float _pct);
     void draw();
     void setNewPos(ofVec2f _newPos);
+    void easeIn(float _pct);
+    
 private:
     ofVec2f initPos, finalPos, currentPos;
     float pct;

@@ -11,8 +11,10 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    pct +=0.01;
-    myCircle.update(pct);
+    if (pct < 0.99){
+        pct += 0.01;}
+    
+    myCircle.easeIn(pct);
     
 }
 
