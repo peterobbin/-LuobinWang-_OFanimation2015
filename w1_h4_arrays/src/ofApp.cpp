@@ -32,7 +32,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     for (int i = 0; i< NUM_CIRCLES ; i++){
-    myCircle[i].draw(255,255,255,rad[i]);
+    myCircle[i].draw(255,255,255,rad[i], i);
     
     }
   
