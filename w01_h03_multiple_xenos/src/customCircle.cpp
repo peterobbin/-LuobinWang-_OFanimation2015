@@ -1,9 +1,24 @@
 //
 //  customCircle.cpp
-//  w01_h03_multiple_xenos
+//  01_simpleClass
 //
-//  Created by peterobbin on 2/8/15.
+//  Created by Bernardo Santos Schorr on 1/31/15.
 //
 //
 
 #include "customCircle.h"
+
+void customCircle::setup(ofVec2f _initPos) {
+    currentPos = _initPos;
+}
+
+void customCircle::update(ofVec2f _mouse) {
+    
+    pct = 0.05;
+    currentPos = currentPos * (1 - pct) + _mouse * pct;
+    
+}
+
+void customCircle::draw() {
+    ofCircle(currentPos, 10);
+   
