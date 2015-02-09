@@ -21,6 +21,10 @@ public:
     void gotMessage(ofMessage msg);
     
     customCircle myCircle;
+    customCircle secondCircle;
+    customCircle thirdCircle;
+    customCircle fourthCircle;
+    customCircle fifthCircle;
     float pct;
     
 };

@@ -16,15 +16,17 @@ void customCircle::setup(ofVec2f _initPos) {
     currentPos = _initPos;
 }
 
-void customCircle::update(ofVec2f _mouse) {
+void customCircle::update(ofVec2f _mouse, float _pct) {
     
-    pct = 0.05;
+    pct = _pct;
     currentPos = currentPos * (1 - pct) + _mouse * pct;
     
 }
 
-void customCircle::draw() {
-    
-    ofCircle(currentPos, 10);
-    ofDrawBitmapString("Move your mouse around.", 30, 30);
-}
+void customCircle::draw(float _r, float _g, float _b) {
+    r = _r;
+    g = _g;
+    b = _b;
+    ofSetColor(r,g,b);
+    ofCircle(currentPos, 50);
+    }
