@@ -10,15 +10,15 @@ void ofApp::setup(){
     for(int i = 0; i < NUM_CIRCLES; i++){
         pct[i] = (i + 0.01)*0.01;
         myCircle[i].setup(ofVec2f(ofGetWidth()/2, ofGetHeight()/2));
-        scatterX[i] = ofRandom(-100,100);
-        scatterY[i] = ofRandom(-100,100);
+        scatterX[i] = ofRandom(-500,500);
+        scatterY[i] = ofRandom(-500,500);
         rad[i] = i/2;
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    ofNoFill();
+    //ofNoFill();
     for (int i = 0; i<NUM_CIRCLES; i++){
     myCircle[i].update(ofVec2f(ofGetMouseX()+scatterX[i], ofGetMouseY()+scatterY[i]), pct[i]);
         
@@ -36,6 +36,7 @@ void ofApp::draw(){
     
     }
   
+    
     
 }
 

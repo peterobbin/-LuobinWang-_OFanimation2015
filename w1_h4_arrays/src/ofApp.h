@@ -25,7 +25,7 @@ public:
    
     
     
-#define NUM_CIRCLES 20
+#define NUM_CIRCLES 100
     customCircle myCircle[NUM_CIRCLES];
     float pct[NUM_CIRCLES];
     float scatterX[NUM_CIRCLES], scatterY[NUM_CIRCLES];

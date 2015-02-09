@@ -18,6 +18,7 @@ void customCircle::setup(ofVec2f _initPos) {
 
 void customCircle::update(ofVec2f _mouse, float _pct) {
     
+    pace = (_mouse - currentPos)*0.05;
     pct = _pct;
     currentPos = currentPos * (1 - pct) + _mouse * pct;
     
@@ -27,7 +28,10 @@ void customCircle::draw(float _r, float _g, float _b, float _rad) {
     r = _r;
     g = _g;
     b = _b;
-    rad = _rad;
+    rad = _rad * pace.x ;
     ofSetColor(r,g,b);
     ofCircle(currentPos, rad);
+    
+    
+
 }
