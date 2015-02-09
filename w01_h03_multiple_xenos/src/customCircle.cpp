@@ -8,6 +8,10 @@
 
 #include "customCircle.h"
 
+customCircle::customCircle() {
+    
+}
+
 void customCircle::setup(ofVec2f _initPos) {
     currentPos = _initPos;
 }
@@ -20,5 +24,7 @@ void customCircle::update(ofVec2f _mouse) {
 }
 
 void customCircle::draw() {
+    
     ofCircle(currentPos, 10);
-   
+    ofDrawBitmapString("Move your mouse around.", 30, 30);
+}
