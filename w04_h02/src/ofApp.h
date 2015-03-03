@@ -25,6 +25,6 @@ public:
     Mover follower;
     vector<Mover> followerList;
     
-    ofVec2f gravity, wind, mouseVel, mag;
+    ofVec2f gravity, wind, mouseVel, mag, lineStart, lineEnd;
     float windStrenth, spring;
 };

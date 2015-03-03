@@ -37,6 +37,7 @@ void Mover::update(){
     vel = vel + acc;
     pos = pos + vel;
     
+   
     
     
     if (pos.x<0) {
@@ -69,8 +70,19 @@ void Mover::update(){
     
 }
 
+void Mover::updateLine(ofVec2f _lineStart, ofVec2f _lineEnd){
+    lineStart = _lineStart;
+    lineEnd = _lineEnd;
+}
+
+
 
 
 void Mover::draw(){
+    
     ofCircle(pos, rad);
+}
+
+void Mover::drawLine(){
+    ofLine(lineStart, lineEnd);
 }

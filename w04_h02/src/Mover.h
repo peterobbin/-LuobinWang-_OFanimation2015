@@ -18,8 +18,10 @@ public:
     void draw();
     void collide();
     void resetVel();
+    void drawLine();
+    void updateLine(ofVec2f _lineStart, ofVec2f _lineEnd);
     
-    ofVec2f pos, vel, acc;
+    ofVec2f pos, vel, acc, lineStart, lineEnd;
     
     float mass,rad;
     

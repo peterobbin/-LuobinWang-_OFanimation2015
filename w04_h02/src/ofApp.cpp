@@ -10,7 +10,7 @@ void ofApp::setup(){
     spring = 0.05;
     
     
-    for (int i = 0; i< 20; i++){
+    for (int i = 0; i< 400; i++){
         
         Mover myFollowers;
         myFollowers.setup(ofGetWidth()/2 + ofRandom(-100,100), ofGetHeight()/2+ ofRandom(-100,100),1.0);
@@ -37,19 +37,30 @@ void ofApp::update(){
         for (int k = 0; k< 20; k++){
             
             ofVec2f dis = followerList[i].pos - followerList[k].pos;
-            float minDis = followerList[i].rad*2;
+            float minDis = followerList[i].rad + followerList[k].rad ;
+            
+           //lineStart = followerList[i].pos;
+            //lineEnd = followerList[k].pos;
+           // ofLog(OF_LOG_NOTICE, "line" + ofToString(lineStart.x) );
+            //followerList[i].updateLine(lineStart,lineEnd);
             
             
             
-            if (dis.length() < minDis*2) {
+            
+            if (dis.length() < minDis && i != k) {
+                
+                
                 followerList[i].resetForces();
                 float angle = atan2(dis.y, dis.x);
                 ofVec2f targetDis = ofVec2f(dis.x+cos(angle)*minDis,dis.y+cos(angle)*minDis);
                 
+            
                 
-               followerList[i].applyForce(targetDis/100);
+                
+               followerList[i].applyForce(targetDis/30);
                 
                 ofLog(OF_LOG_NOTICE, "collision force" + ofToString(targetDis.x) );
+                
                 
                 followerList[i].pos = followerList[i].pos*0.93 + (targetDis+followerList[i].pos)*0.07;
             }
@@ -108,13 +119,19 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    
+    
+    
     for (int i = 0; i< 20; i++){
         
         
+       
         followerList[i].draw();
-        
+      //  followerList[i].drawLine();
         
     }
+    
+    
 
     
     
