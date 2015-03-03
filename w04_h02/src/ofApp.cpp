@@ -33,24 +33,25 @@ void ofApp::update(){
     
     for (int i = 0; i< 20; i++){
         
-        
+        followerList[i].resetForces();
         for (int k = 0; k< 20; k++){
+            
             ofVec2f dis = followerList[i].pos - followerList[k].pos;
             float minDis = followerList[i].rad*2;
             
             
             
-            if (dis.length() < minDis) {
-                
+            if (dis.length() < minDis*2) {
+                followerList[i].resetForces();
                 float angle = atan2(dis.y, dis.x);
                 ofVec2f targetDis = ofVec2f(dis.x+cos(angle)*minDis,dis.y+cos(angle)*minDis);
                 
                 
-               
+               followerList[i].applyForce(targetDis/100);
                 
+                ofLog(OF_LOG_NOTICE, "collision force" + ofToString(targetDis.x) );
                 
-                
-                followerList[i].pos = followerList[i].pos*0.9 + (targetDis+followerList[i].pos)*0.1;
+                followerList[i].pos = followerList[i].pos*0.93 + (targetDis+followerList[i].pos)*0.07;
             }
             
         }
@@ -58,7 +59,7 @@ void ofApp::update(){
         if(followerList[i].vel.x > 3){followerList[i].vel.x = 3;}
         if(followerList[i].vel.y > 3){followerList[i].vel.y = 3;}
         
-        followerList[i].resetForces();
+       
         mag.set(followerList[i].pos.x - ofGetMouseX(), followerList[i].pos.y - ofGetMouseY());
         mag.normalize();
         mag.scale(0.2);
@@ -98,7 +99,7 @@ void ofApp::update(){
     
     mover.applyForce(gravity*mover.mass);
     
-    ofLog(OF_LOG_NOTICE, "wind force is " + ofToString(mag.x) + "  "+ ofToString(mag.y));
+    
     mouseVel.set((ofGetMouseX()-ofGetPreviousMouseX())/5,(ofGetMouseY()-ofGetPreviousMouseY())/5);
     mover.update();
     
