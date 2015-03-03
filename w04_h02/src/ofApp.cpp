@@ -10,7 +10,7 @@ void ofApp::setup(){
     spring = 0.05;
     
     
-    for (int i = 0; i< 400; i++){
+    for (int i = 0; i< 40; i++){
         
         Mover myFollowers;
         myFollowers.setup(ofGetWidth()/2 + ofRandom(-100,100), ofGetHeight()/2+ ofRandom(-100,100),1.0);
@@ -31,10 +31,10 @@ void ofApp::update(){
     //  mover.applyForce(wind);
     
     
-    for (int i = 0; i< 20; i++){
+    for (int i = 0; i< 40; i++){
         
         followerList[i].resetForces();
-        for (int k = 0; k< 20; k++){
+        for (int k = 0; k< 40; k++){
             
             ofVec2f dis = followerList[i].pos - followerList[k].pos;
             float minDis = followerList[i].rad + followerList[k].rad ;
@@ -52,7 +52,7 @@ void ofApp::update(){
                 
                 followerList[i].resetForces();
                 float angle = atan2(dis.y, dis.x);
-                ofVec2f targetDis = ofVec2f(dis.x+cos(angle)*minDis,dis.y+cos(angle)*minDis);
+                ofVec2f targetDis = ofVec2f(dis.x+cos(angle)*minDis,dis.y+sin(angle)*minDis);
                 
             
                 
@@ -122,7 +122,7 @@ void ofApp::draw(){
     
     
     
-    for (int i = 0; i< 20; i++){
+    for (int i = 0; i< 40; i++){
         
         
        
