@@ -15,7 +15,7 @@ void ofApp::setup(){
         Mover myFollowers;
         myFollowers.setup(ofGetWidth()/2 + ofRandom(-100,100), ofGetHeight()/2+ ofRandom(-100,100),1.0);
         followerList.push_back(myFollowers);
-    
+        
     }
     
     
@@ -39,9 +39,9 @@ void ofApp::update(){
             ofVec2f dis = followerList[i].pos - followerList[k].pos;
             float minDis = followerList[i].rad + followerList[k].rad ;
             
-           //lineStart = followerList[i].pos;
+            //lineStart = followerList[i].pos;
             //lineEnd = followerList[k].pos;
-           // ofLog(OF_LOG_NOTICE, "line" + ofToString(lineStart.x) );
+            // ofLog(OF_LOG_NOTICE, "line" + ofToString(lineStart.x) );
             //followerList[i].updateLine(lineStart,lineEnd);
             
             
@@ -54,10 +54,10 @@ void ofApp::update(){
                 float angle = atan2(dis.y, dis.x);
                 ofVec2f targetDis = ofVec2f(dis.x+cos(angle)*minDis,dis.y+sin(angle)*minDis);
                 
-            
                 
                 
-               followerList[i].applyForce(targetDis/30);
+                
+                followerList[i].applyForce(targetDis/30);
                 
                 ofLog(OF_LOG_NOTICE, "collision force" + ofToString(targetDis.x) );
                 
@@ -70,7 +70,7 @@ void ofApp::update(){
         if(followerList[i].vel.x > 3){followerList[i].vel.x = 3;}
         if(followerList[i].vel.y > 3){followerList[i].vel.y = 3;}
         
-       
+        
         mag.set(followerList[i].pos.x - ofGetMouseX(), followerList[i].pos.y - ofGetMouseY());
         mag.normalize();
         mag.scale(0.2);
@@ -82,7 +82,6 @@ void ofApp::update(){
         followerList[i].update();
         
     }
-
     
     
     
@@ -91,21 +90,22 @@ void ofApp::update(){
     
     
     
-   /*
-    if(follower.vel.x > 3){follower.vel.x = 3;}
-    if(follower.vel.y > 3){follower.vel.y = 3;}
     
-    
-    
-    follower.resetForces();
-    mag.set(follower.pos.x - ofGetMouseX(), follower.pos.y - ofGetMouseY());
-    mag.normalize();
-    mag.scale(0.2);
-    mag = -mag;
-    follower.applyForce(mag);
-    follower.update();
-    
-    */
+    /*
+     if(follower.vel.x > 3){follower.vel.x = 3;}
+     if(follower.vel.y > 3){follower.vel.y = 3;}
+     
+     
+     
+     follower.resetForces();
+     mag.set(follower.pos.x - ofGetMouseX(), follower.pos.y - ofGetMouseY());
+     mag.normalize();
+     mag.scale(0.2);
+     mag = -mag;
+     follower.applyForce(mag);
+     follower.update();
+     
+     */
     
     
     mover.applyForce(gravity*mover.mass);
@@ -125,14 +125,14 @@ void ofApp::draw(){
     for (int i = 0; i< 40; i++){
         
         
-       
+        
         followerList[i].draw();
-      //  followerList[i].drawLine();
+        //  followerList[i].drawLine();
         
     }
     
     
-
+    
     
     
     //mover.draw();
