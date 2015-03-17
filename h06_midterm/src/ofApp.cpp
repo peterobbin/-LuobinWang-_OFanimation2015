@@ -19,8 +19,7 @@ void ofApp::setup(){
     
     
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
-    //mesh.setMode(OF_PRIMITIVE_LINES);
-    //Set up vertices and colors
+ 
     for (int y=0; y<H; y++) {
         for (int x=0; x<W; x++) {
             pos = ofVec3f((x - W/2) * 200, (y - H/2) * 200, 0 );
@@ -161,8 +160,7 @@ void ofApp::update(){
     ofLog(OF_LOG_NOTICE, "diff" + ofToString(abs(sec- cuSec)));
     
     
-    //Graph of the sound buffer
-    //ofSetColor( 255 );
+
   
     
     //Change vertices
@@ -179,7 +177,7 @@ void ofApp::update(){
             //Get Perlin noise value
             float value = ofNoise( x * 0.4, y * 0.4, ctime/5);
             
-            //Change z-coordinate of vertex
+            
             
             
             float compareV =100 - buffer[k] * 100;
@@ -201,7 +199,7 @@ void ofApp::update(){
             mesh.setColor( i, ofColor( value*255, (reverseValue*100+50)*compareV/100, (reverseValue*200+55)/(compareV/100) ) );
         }
     }
-   // setNormals( mesh );	//Update the normals
+   
 }
 
 //--------------------------------------------------------------
@@ -209,10 +207,7 @@ void ofApp::draw(){
     
     
     
-    ofEnableDepthTest();				//Enable z-buffering
-    
-    //Set a gradient background from white to gray
-   // ofBackgroundGradient( ofColor( 255 ), ofColor( 128 ) );
+    ofEnableDepthTest();
     
    
     
@@ -220,24 +215,19 @@ void ofApp::draw(){
     
     ofBackground(bgColor);
     
-    ofPushMatrix();						//Store the coordinate system
+    ofPushMatrix();
     
-    //Move the coordinate center to screen's center
-    ofTranslate( ofGetWidth()/2, ofGetHeight(), 0 );
+       ofTranslate( ofGetWidth()/2, ofGetHeight(), 0 );
     
-    //Calculate the rotation angle
-    float time = ofGetElapsedTimef();   //Get time in seconds
-    float angle = time * 20;			//Compute angle. We rotate at speed
-    //20 degrees per second
-    ofRotate( 70, 1, 0, 0 );			//Rotate coordinate system
-    //ofRotate( angle, 0, 0, 1 );
-    
-    //Draw mesh
-    //Here ofSetColor() does not affects the result of drawing,
-    //because the mesh has its own vertices' colors
+   
+    float time = ofGetElapsedTimef();
+    float angle = time * 20;
+      ofRotate( 70, 1, 0, 0 );
+  
+ 
     mesh.draw();
     
-    ofPopMatrix();      //Restore the coordinate system
+    ofPopMatrix();
     
     
     
@@ -266,8 +256,8 @@ void ofApp::draw(){
     
     
     ofPath curve3;
-       curve3.arc(        p3, 150, 150, hour*15+10-90, hour*15-90 );
-    curve3.arcNegative(p3, 140, 140, hour*15-90, hour*15+10-90);
+       curve3.arc(        p3, 150, 150, hour*30+10-90, hour*30-90 );
+    curve3.arcNegative(p3, 140, 140, hour*30-90, hour*30+10-90);
     curve3.close();
     curve3.setArcResolution(60);
     ofColor c3(0, 255,255);
