@@ -319,7 +319,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 }
 
 //--------------------------------------------------------------
-//Universal function which sets normals for the triangle mesh
+//Universal function which sets normals for the triangle mesh//mastering oF
 void setNormals( ofMesh &mesh ){
     
     //The number of the vertices

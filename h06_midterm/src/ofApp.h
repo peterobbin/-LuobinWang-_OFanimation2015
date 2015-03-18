@@ -18,7 +18,7 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
-    
+    //--------audio part from 'Mastering openFrameworks"
     
     //Function for receiving audio
     void audioReceived( float *input, int bufferSize, int nChannels );
@@ -98,7 +98,7 @@ public:
 
 
 
-//Universal function which sets normals
+//Universal function which sets normals  //mastering
 //for the triangle mesh
 void setNormals( ofMesh &mesh );
 
