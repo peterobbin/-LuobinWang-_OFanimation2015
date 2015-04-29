@@ -31,6 +31,8 @@ class ofApp : public ofBaseApp{
     
     
     
+    
+    
     void audioIn(float * input, int bufferSize, int nChannels);
     
     vector <float> left;
