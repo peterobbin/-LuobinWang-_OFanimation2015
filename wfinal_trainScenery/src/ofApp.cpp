@@ -1,213 +1,439 @@
 #include "ofApp.h"
 
-//--------------------------------------------------------------
-void ofApp::setup(){
-    
-    
-    ofBackground(0);
-    music.loadSound("wantyougone.mp3");
-    mesh.setMode(OF_PRIMITIVE_POINTS);
-    width =50;
-    height = 50;
-    res = 10;
-    
-    img.loadImage("gis.jpg");
-    
-    bUsePanCam = false;
-    
-    for(int y = -height/2; y<height/2;y++){
-        for(int x = -width/2; x < width/2; x++){
-            mesh.addVertex(ofPoint(x*res, y*res, 0));
-            
-            
-            
-        
-        }
-    }
-    
-    
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            mesh.addTexCoord(ofVec2f(x, height - y)*res);
-        }
-    }
-    
-    
-    for (int y = 0; y < height - 1; y++) {
-        for (int x = 0; x < width - 1  ; x++){
-            mesh.addIndex(x + y*width);   //0
-            mesh.addIndex((x+1) + y*width);    //1
-            mesh.addIndex(x + (y+1)*width);      //50
-            
-            mesh.addIndex((x+1)+ y*width);        //1
-            mesh.addIndex((x+1) + (y+1)*width);        //51
-            mesh.addIndex(x + (y+1)*width);      //50`
-        }
-    }
-    
-    // we will bounce a circle using these variables:
-    px = 300;
-    py = 300;
-    vx = 0;
-    vy = 0;
-    
-    // the fft needs to be smoothed out, so we create an array of floats
-    // for that purpose:
-    fftSmoothed = new float[8192];
-    for (int i = 0; i < 8192; i++){
-        fftSmoothed[i] = 0;
-    }
-    
-    nBandsToGet = 4000;
-    music.play();
-    
-    //panCam.setPosition(500, 0, 0);
-}
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::setup() {
+   // ofSetLogLevel(OF_LOG_VERBOSE);
+    //----------------------shadershere *****************************************
+   
     
-    ofSoundUpdate();
+    srcImg.loadImage("A.jpg");
+    dstImg.loadImage("steamywindow.png");
+    brushImg.loadImage("brush.png");
     
+    trainview.loadMovie("trainview.mp4");
+    trainview.play();
     
-    
-    
-    float * val = ofSoundGetSpectrum(nBandsToGet);		// request 128 values for fft
-    for (int i = 0;i < nBandsToGet; i++){
-        
-        // let the smoothed calue sink to zero:
-        fftSmoothed[i] *= 0.96f;
-        
-        // take the max, either the smoothed or the incoming:
-        if (fftSmoothed[i] < val[i]) fftSmoothed[i] = val[i];
-        
-        // mesh.setVertex(i, ofVec3f())
-        
-    }
-    
-
-    float time = ofGetElapsedTimef() * 5;
-    
-    for(int y = 0; y < height; y ++){
-        for (int x = 0; x < width; x++) {
-            int index = (y * width) + x;
-            ofVec3f pos = mesh.getVertex(index);
-            pos.z = ofNoise((x+time)*0.05, (y+time)*0.05) * 75.0;
-           // cout <<index <<endl;
-            int shiftindex = ofMap(index, 0, 3000, 0, 128);
-            //cout << shiftindex << endl;
-            
-           // mesh.setVertex(index, pos );
-           
-        }
-    }
-    
-    
-    //pancam
-    
-    float radius = 300.0;
-    ofVec3f center = ofVec3f(0,0,0);
-    float x = cos(ofGetElapsedTimef()*0.5)*radius;
-    float y = sin(ofGetElapsedTimef()*0.5)*radius;
-    
-    
-    panCam.setPosition(x, y, 200);
-    
-    panCam.lookAt(center, ofVec3f(0,0,1));
+    width = ofGetWidth();
+    height = ofGetHeight();
     
    
     
     
-}
+    
+//---------shaders start
+    
+    maskFbo.allocate(width,height);
+    fbo.allocate(width,height);
+    
 
-//--------------------------------------------------------------
-void ofApp::draw(){
-    ofEnableDepthTest();
     
     
-    //img.draw(0, 0);
-    
-    
-    if(bUsePanCam == true){
-        panCam.begin();
+#ifdef TARGET_OPENGLES
+    shader.load("shaders_gles/alphamask.vert","shaders_gles/alphamask.frag");
+#else
+    if(ofGetGLProgrammableRenderer()){
+        string vertex = "#version 150\n\
+        \n\
+        uniform mat4 projectionMatrix;\n\
+        uniform mat4 modelViewMatrix;\n\
+        uniform mat4 modelViewProjectionMatrix;\n\
+        \n\
+        \n\
+        in vec4  position;\n\
+        in vec2  texcoord;\n\
+        \n\
+        out vec2 texCoordVarying;\n\
+        \n\
+        void main()\n\
+        {\n\
+        texCoordVarying = texcoord;\
+        gl_Position = modelViewProjectionMatrix * position;\n\
+        }";
+        string fragment = "#version 150\n\
+        \n\
+        uniform sampler2DRect tex0;\
+        uniform sampler2DRect maskTex;\
+        in vec2 texCoordVarying;\n\
+        \
+        out vec4 fragColor;\n\
+        void main (void){\
+        vec2 pos = texCoordVarying;\
+        \
+        vec3 src = texture(tex0, pos).rgb;\
+        float mask = texture(maskTex, pos).r;\
+        \
+        fragColor = vec4( src , mask);\
+        }";
+        shader.setupShaderFromSource(GL_VERTEX_SHADER, vertex);
+        shader.setupShaderFromSource(GL_FRAGMENT_SHADER, fragment);
+        shader.bindDefaults();
+        shader.linkProgram();
     }else{
-        easyCam.begin();
+        string shaderProgram = "#version 120\n \
+        #extension GL_ARB_texture_rectangle : enable\n \
+        \
+        uniform sampler2DRect tex0;\
+        uniform sampler2DRect maskTex;\
+        \
+        void main (void){\
+        vec2 pos = gl_TexCoord[0].st;\
+        \
+        vec3 src = texture2DRect(tex0, pos).rgb;\
+        float mask = texture2DRect(maskTex, pos).r;\
+        \
+        gl_FragColor = vec4( src , mask);\
+        }";
+        shader.setupShaderFromSource(GL_FRAGMENT_SHADER, shaderProgram);
+        shader.linkProgram();
     }
+#endif
+    
+    // Let�s clear the FBO�s
+    // otherwise it will bring some junk with it from the memory    
+    maskFbo.begin();
+    ofClear(125,125,125,255);
+    maskFbo.end();
+    
+    fbo.begin();
+    ofClear(125,125,125,255);
+    fbo.end();
+    
+    bBrushDown = false;
 
-//    easyCam.draw();
-//    panCam.draw();
-    //img.bind();
-//    mesh.drawWireframe();
-    mesh.draw();
-   // img.unbind();
     
-    if(bUsePanCam == true){
-        panCam.end();
-    }else{
-        easyCam.end();
+//----------------------shaders end here *****************************************
+    
+    
+    
+    // enable depth->video image calibration
+    kinect.setRegistration(true);
+    
+    kinect.init();
+
+    
+    kinect.open();		// opens first available kinect
+
+    
+    // print the intrinsic IR sensor values
+    if(kinect.isConnected()) {
+//        ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
+//        ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
+//        ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
+//        ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
     }
     
+
+    
+    colorImg.allocate(kinect.width, kinect.height);
+    grayImage.allocate(kinect.width, kinect.height);
+    grayThreshNear.allocate(kinect.width, kinect.height);
+    grayThreshFar.allocate(kinect.width, kinect.height);
+    
+    nearThreshold = 229;
+    farThreshold = 225;
+    bThreshWithOpenCV = true;
+    
+    ofSetFrameRate(60);
+    
+    // zero the tilt on startup
+    angle = 0;
+    kinect.setCameraTiltAngle(angle);
+    
+    // start from the front
+    bDrawPointCloud = false;
+}
+
+//--------------------------------------------------------------
+void ofApp::update() {
+    
+    ofBackground(100, 100, 100);
+    
+    kinect.update();
+    trainview.update();
     
     
-    float width = (float)(5*128) / nBandsToGet;
     
     
-    for (int i = 0;i < nBandsToGet; i++){
-        // (we use negative height here, because we want to flip them
-        // because the top corner is 0,0)
-       
-        ofVec3f meshPos = mesh.getVertex(i);
-       // cout<< fftSmoothed[i]*200<<endl;
-        meshPos.z = fftSmoothed[i]*200;
+
+    if(kinect.isFrameNew()) {
         
-        mesh.setVertex(i, meshPos);
+      
+        grayImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
         
+
+        if(bThreshWithOpenCV) {
+            grayThreshNear = grayImage;
+            grayThreshFar = grayImage;
+            grayThreshNear.threshold(nearThreshold, true);
+            grayThreshFar.threshold(farThreshold);
+            cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
+        } else {
+            
+           
+            unsigned char * pix = grayImage.getPixels();
+            
+            int numPixels = grayImage.getWidth() * grayImage.getHeight();
+            for(int i = 0; i < numPixels; i++) {
+                if(pix[i] < nearThreshold && pix[i] > farThreshold) {
+                    pix[i] = 255;
+                } else {
+                    pix[i] = 0;
+                }
+            }
+        }
+        
+      
+        grayImage.flagImageChanged();
+        
+    
+        contourFinder.findContours(grayImage, 10, (kinect.width*kinect.height)/2, 20, false);
     }
+    
+    blobTracker.update(grayImage, 80);
+    
+
+//---------------old hand tracking mask
+//    for (int i = 0; i < blobTracker.size(); i++){
+//
+//
+//        if (blobTracker[i].gotFingers) {
+//            bBrushDown = true;
+//       
+//            blobPosx = blobTracker[i].centroid.x * 1280 ;
+//            blobPosy = blobTracker[i].centroid.y * 1400 - 200;
+//            
+//         
+//            
+//            brushImg.draw(blobPosx, blobPosy, 400 * blobTracker[i].boundingRect.width,400 * blobTracker[i].boundingRect.height);
+//            
+//            cout<< blobPosx <<endl;
+//            cout<< blobPosy <<endl;
+//            
+//          
+//  
+//        }else{bBrushDown = false;}
+//        
+//        if (blobTracker[i].gotFingers == false){
+//            bBrushDown =false;
+//        }
+//        
+//        
+//    }
+//    
+    
+    
+    
+    maskFbo.begin();
+    
+    for (int i = 0; i < blobTracker.size(); i++){
+    
+    
+    
+    
+        if (blobTracker[i].gotFingers){
+                       float  blobPosx = blobTracker[i].centroid.x * 750 ;
+                       float  blobPosy = blobTracker[i].centroid.y * ofGetHeight() - 200;
+            
+            
+            brushImg.draw(blobPosx, blobPosy, 400 * blobTracker[i].boundingRect.width,400 * blobTracker[i].boundingRect.height);
+            
+            
+            fingerReady = true; 
+            }else{
+//                fingerReady = false;
+//                int time = ofGetElapsedTimef()*1000;
+//                int timeModular = time%10;
+//                cout<<timeModular<<endl;
+//                if(timeModular == 0){
+//                    
+//                    ofSetColor(0, 5);
+//                    ofRect(0, 0, width, height);
+//                    ofSetColor(255, 255);
+//            }
+        }
+    }
+    
+   
+//update screen and make the steam fo back
+    
+    
+    int time = ofGetElapsedTimef()*1000;
+    int timeModular = time%27;
+    cout<<timeModular<<endl;
+    if(timeModular == 0){
+        
+        ofSetColor(0, 5);
+        ofRect(0, 0, ofGetWidth(), ofGetHeight());
+        ofSetColor(255, 255);
+    }
+    
+    
+    
+    
+    
+    
+    maskFbo.end();
+    
+    // HERE the shader-masking happends
+    //
+    fbo.begin();
+    // Cleaning everthing with alpha mask on 0 in order to make it transparent for default
+    ofClear(0, 0, 0, 0);
+    
+    shader.begin();
+    shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+    
+    trainview.draw(0, 0, ofGetWidth()+200, ofGetHeight()+200);
+    //srcImg.draw(0,0);
+    
+    shader.end();
+    fbo.end();
+    
+
+    
+    
+    
+    
+   
+
+    
+    
     
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::draw() {
+    ofSetColor(255,255);
+    
+    dstImg.draw(0,0,ofGetWidth(), ofGetHeight());
+    
+    fbo.draw(0,0,ofGetWidth(), ofGetHeight());
+    
+    
+    
+//     grayImage.draw(10, 320, 400, 300);
+//     contourFinder.draw(10, 320, 400, 300);
+    
+    
+    
 
-    bUsePanCam = !bUsePanCam;
+
+    
+    
+    
+}
+
+
+
+//--------------------------------------------------------------
+void ofApp::exit() {
+    kinect.setCameraTiltAngle(0); // zero the tilt on exit
+    kinect.close();
+    
+#ifdef USE_TWO_KINECTS
+    kinect2.close();
+#endif
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
+void ofApp::keyPressed (int key) {
+    switch (key) {
+        case ' ':
+            bThreshWithOpenCV = !bThreshWithOpenCV;
+            break;
+            
+        case'p':
+            bDrawPointCloud = !bDrawPointCloud;
+            break;
+            
+        case '>':
+        case '.':
+            farThreshold ++;
+            if (farThreshold > 255) farThreshold = 255;
+            break;
+            
+        case '<':
+        case ',':
+            farThreshold --;
+            if (farThreshold < 0) farThreshold = 0;
+            break;
+            
+        case '+':
+        case '=':
+            nearThreshold ++;
+            if (nearThreshold > 255) nearThreshold = 255;
+            break;
+            
+        case '-':
+            nearThreshold --;
+            if (nearThreshold < 0) nearThreshold = 0;
+            break;
+            
+        case 'w':
+            kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
+            break;
+            
+        case 'o':
+            kinect.setCameraTiltAngle(angle); // go back to prev tilt
+            kinect.open();
+            break;
+            
+        case 'c':
+            kinect.setCameraTiltAngle(0); // zero the tilt
+            kinect.close();
+            break;
+            
+        case '1':
+            kinect.setLed(ofxKinect::LED_GREEN);
+            break;
+            
+        case '2':
+            kinect.setLed(ofxKinect::LED_YELLOW);
+            break;
+            
+        case '3':
+            kinect.setLed(ofxKinect::LED_RED);
+            break;
+            
+        case '4':
+            kinect.setLed(ofxKinect::LED_BLINK_GREEN);
+            break;
+            
+        case '5':
+            kinect.setLed(ofxKinect::LED_BLINK_YELLOW_RED);
+            break;
+            
+        case '0':
+            kinect.setLed(ofxKinect::LED_OFF);
+            break;
+            
+        case OF_KEY_UP:
+            angle++;
+            if(angle>30) angle=30;
+            kinect.setCameraTiltAngle(angle);
+            break;
+            
+        case OF_KEY_DOWN:
+            angle--;
+            if(angle<-30) angle=-30;
+            kinect.setCameraTiltAngle(angle);
+            break;
+    }
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-
-}
+void ofApp::mouseDragged(int x, int y, int button)
+{}
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-
-}
+void ofApp::mousePressed(int x, int y, int button)
+{}
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
-}
+void ofApp::mouseReleased(int x, int y, int button)
+{}
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
-}
+void ofApp::windowResized(int w, int h)
+{}

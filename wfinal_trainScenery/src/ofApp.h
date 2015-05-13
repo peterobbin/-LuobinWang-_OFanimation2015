@@ -1,38 +1,70 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxOpenCv.h"
+#include "ofxKinect.h"
+#include "ofxBlobTracker.h"
 
-class ofApp : public ofBaseApp{
 
-	public:
-		void setup();
-		void update();
-		void draw();
+class ofApp : public ofBaseApp {
+public:
+    
+    
+    void setup();
+    void update();
+    void draw();
+    void exit();
+    
+    void drawPointCloud();
+    
+    void keyPressed(int key);
+    void mouseDragged(int x, int y, int button);
+    void mousePressed(int x, int y, int button);
+    void mouseReleased(int x, int y, int button);
+    void windowResized(int w, int h);
+    
+    ofxKinect kinect;
 
-		void keyPressed(int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
-		
-    ofSoundPlayer music;
-    float 				* fftSmoothed;
     
-    int nBandsToGet;
-    float prevx, prevy;
+    ofxCvColorImage colorImg;
     
-    float 				px, py, vx, vy;
+    ofxCvGrayscaleImage grayImage; // grayscale depth image
+    ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
+    ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
     
-    ofVboMesh mesh;
-    ofEasyCam easyCam;
-    ofCamera panCam;
+    ofxCvContourFinder contourFinder;
     
-    ofImage img;
-    int width, height, res;
+    ofxBlobTracker blobTracker;
+    bool bThreshWithOpenCV;
+    bool bDrawPointCloud;
+   
     
-    bool bUsePanCam;
+    int nearThreshold;
+    int farThreshold;
+    
+    int angle;
+    
+    ofVideoPlayer trainview;
+    
+    
+ //----------------shaders variables here______________________
+    ofImage     srcImg;
+    ofImage     dstImg;
+    ofImage     brushImg;
+    ofVideoPlayer video;
+    
+    int width;
+    int height;
+    
+    ofFbo       maskFbo;
+    ofFbo       fbo;
+    
+    ofShader    shader;
+    
+    bool        bBrushDown;
+    bool        fingerReady;
+    
+//_______________________
+    
+
 };
